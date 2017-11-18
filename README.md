@@ -49,3 +49,11 @@ $ git clone https://github.com/gilsondev/work-at-olist.git
  ```shell
  $ make run
  ```
+
+ ## Import categories
+
+ We have the custom command called `importcategories` to import all categories of channel. Example:
+
+ ```shell
+ $ python work-at-olist/manage.py importcategories wallmart initial_data.csv
+ ```

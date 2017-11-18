@@ -9,3 +9,7 @@
 tmp
 .venv
 .vscode
+.coverage
+*.db
+*.sqlite
+*.sqlite3

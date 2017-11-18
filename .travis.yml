@@ -1,18 +1,22 @@
 env:
   global:
     CODECLIMATE_REPO_TOKEN=da90937a1d61a7d933046adb8943e16ee40a57eb456c639fc5151873aa86d449
+services:
+  - postgresql
 language: python
 python:
   - '3.5'
   - '3.6'
 install:
-  - cp local.env .env
+  - make local_setup
   - pip install codeclimate-test-reporter
   - pip uninstall -y coverage
   - pip install coverage==4.0.0
-  - make setup
+before_script:
+  - psql -c 'create database olist;' -U postgres
+  - python work-at-olist/manage.py migrate
 script:
-  - coverage run work-at-olist/manage.py test
+  - coverage run work-at-olist/manage.py test core
   - codeclimate-test-reporter --file .coverage
 deploy:
   provider: heroku
