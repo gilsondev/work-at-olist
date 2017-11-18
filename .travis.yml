@@ -1,0 +1,21 @@
+env:
+  global:
+    CODECLIMATE_REPO_TOKEN=da90937a1d61a7d933046adb8943e16ee40a57eb456c639fc5151873aa86d449
+language: python
+python:
+  - '3.5'
+  - '3.6'
+install:
+  - cp local.env .env
+  - pip install codeclimate-test-reporter
+  - pip uninstall -y coverage
+  - pip install coverage==4.0.0
+  - make setup
+script:
+  - coverage run work-at-olist/manage.py test
+  - codeclimate-test-reporter --file .coverage
+deploy:
+  provider: heroku
+  api_key:
+    secure: BELNhyq5i9sIyAytVLj3G8HCkLoAYl+/7rQmqD1SDqibq/fbuv30CdZoYmDkgfluumqzLsNvhIResVHOVlypbTYNgLZfDBrz6yN3h5hR3oY47XtMe8+vJET4+8+a3xYESfqCbbUJp6/SJ5Oj5/fCbkqYi6UnYrhAjyRv6m6itYep99B8EXZDzFxFDpvOeTX5+MXir0RX7PO/Y/U5N9s6p4oopsMiNzksM0oUIfntZKYOXfgae/T6Tdurflm1PZkKXI99SiLmo1Etw2GhVgQ0nyyU99A6voOyni7l2IgymgGRrtCTOpSxSX1GMg4kcJKzAnTTMaGO3aXPOnhKQLi2nn1aosSzsLW6vNYvr4ZNjeKKvyHj3Jv3CbOFWqNflGAP1VLh5oTj2KptmxLKLR5H7TZ7tRWyIn0PNZwRL+I0ZrdPqPDp34RoWibt1/wTugjCvgECUmNqdGPiVr0l7LqGqYauDKvVsKn1nLRzrvnEn4/TJ63T+FZKEh1Bcx05I0aVBzm6Q2UDE03ybkGsT/qrqTeBNaL20vSKLP1xdkKczFrit09NXq73ZBzhoqkjHtLgDJncLjxMp9CZPUzEXLErRYr9HUaVyfCvOKdsHCo1IhxOxw1fecoN91iEgcDq/EFFDv3mia5VLwCJR+ltUPPcR/BHN51lqfvCgXNIDFJYdNE=
+  app: olist-gilson

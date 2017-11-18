@@ -1,1 +1,2 @@
 -r requirements/local.txt
+coverage==4.0.0
