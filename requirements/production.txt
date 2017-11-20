@@ -4,3 +4,5 @@ prettyconf
 dj-database-url
 djangorestframework
 django-mptt==0.8.7
+drfdocs==0.0.11
+whitenoise==3.3.1
