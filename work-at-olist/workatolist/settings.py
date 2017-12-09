@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -22,15 +22,17 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=[], cast=config.list)
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'raven.contrib.django.raven_compat',
+    'storages',
     'rest_framework',
     'rest_framework_docs',
+    'rest_framework_recursive',
 
     'core',
 ]
@@ -50,8 +52,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'workatolist.urls'
@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'workatolist.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DB_URL = config('DATABASE_URL', default='sqlite:///tmp/olist.sqlite3')
 DATABASES = {
@@ -85,7 +85,7 @@ DATABASES = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -104,7 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
+# https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -118,11 +118,32 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
 #
-STATIC_ROOT = os.path.join(BASE_DIR, 'public')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATIC_URL = '/static/'
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')
+AWS_STORAGE_BUCKET_NAME = config('AWS_BUCKET_NAME', default='')
+AWS_S3_CUSTOM_DOMAIN = '{bucket}.s3.amazonaws.com'.format(
+    bucket=AWS_STORAGE_BUCKET_NAME
+)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'static'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = config(
+    'STATIC_STORAGE',
+    default='django.contrib.staticfiles.storage.StaticFilesStorage'
+)
+STATIC_URL = config(
+    'STATIC_URL',
+    default='https://{domain}/{location}/'.format(
+        domain=AWS_S3_CUSTOM_DOMAIN,
+        location=AWS_LOCATION
+    )
+)
 
 
 # Channels Configuration

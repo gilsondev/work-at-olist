@@ -5,7 +5,7 @@ services:
     container_name: olist_db
     environment:
       - POSTGRES_DB=olist
-      - POSTGRES_USER=olistDATABASE_URL=sqlite:///tmp/olist.db
+      - POSTGRES_USER=olist
       - POSTGRES_PASSWORD=olist
     ports:
       - "5432:5432"
