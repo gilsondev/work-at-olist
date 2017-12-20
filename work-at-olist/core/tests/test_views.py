@@ -92,3 +92,69 @@ class CategoryResourceTest(APITestCase):
                 ]
             }
         ])
+
+
+class CategoryDetailResourceTest(APITestCase):
+    def setUp(self):
+        self.channel = Channel.objects.create(
+            name="starbucks"
+        )
+
+        self.category_coffee = Category.objects.create(
+            channel=self.channel,
+            name="Coffee"
+        )
+
+        self.category_tea = Category.objects.create(
+            channel=self.channel,
+            name="Tea"
+        )
+
+        self.espresso = Category.objects.create(
+            channel=self.channel,
+            name="Espresso",
+            parent=self.category_coffee
+        )
+        self.latte = Category.objects.create(
+            channel=self.channel,
+            name="Latte Macchiato",
+            parent=self.category_coffee
+        )
+
+        self.iced_tea = Category.objects.create(
+            channel=self.channel,
+            name="Iced Teas",
+            parent=self.category_tea
+        )
+
+        self.iced_espresso = Category.objects.create(
+            channel=self.channel,
+            name="Iced Espresso",
+            parent=self.espresso
+        )
+
+        self.response = self.client.get(
+            "/api/categories/{uid}/".format(uid=self.iced_espresso.uuid),
+            format='json'
+        )
+
+    def test_should_return_status_200(self):
+        self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+
+    def test_should_return_category_detail(self):
+        self.maxDiff = None
+        self.assertEqual(self.response.json(), {
+            "uuid": str(self.iced_espresso.uuid),
+            "name": "Iced Espresso",
+            "parents": [
+                {
+                    "uuid": str(self.category_coffee.uuid),
+                    "name": "Coffee"
+                },
+                {
+                    "uuid": str(self.espresso.uuid),
+                    "name": "Espresso"
+                }
+            ],
+            "subcategories": []
+        })

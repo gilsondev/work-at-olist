@@ -11,7 +11,13 @@ class ChannelSerializer(serializers.ModelSerializer):
         fields = ('uuid', 'name',)
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class BaseCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('uuid', 'name',)
+
+
+class CategorySerializer(BaseCategorySerializer):
     """
     Serializer to define recursive data for categories
     Based on:
@@ -21,3 +27,24 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('uuid', 'name', 'subcategories',)
+
+
+class CategoryDetailSerializer(BaseCategorySerializer):
+    parents = serializers.SerializerMethodField()
+    subcategories = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ('uuid', 'name', 'parents', 'subcategories',)
+
+    def get_parents(self, obj):
+        data = []
+        for parent in obj.get_ancestors():
+            data.append(BaseCategorySerializer(parent).data)
+        return data
+
+    def get_subcategories(self, obj):
+        data = []
+        for subcategory in obj.get_descendants():
+            data.append(CategorySerializer(subcategory).data)
+        return data

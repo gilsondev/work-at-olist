@@ -33,3 +33,6 @@ class CategoryModelTest(TestCase):
 
     def test_should_a_public_unique_identifier(self):
         self.assertIsNotNone(self.category.uuid)
+
+    def test_should_return_category_represent(self):
+        self.assertEqual(str(self.category), "Coffees")
